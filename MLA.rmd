@@ -1,0 +1,105 @@
+---
+title: "Predcition of Activity Levels"
+author: "S. Schwarzbek"
+date: "Tuesday, January 20, 2015"
+output: html_document
+---
+```{r dataLoad}
+library(caret)
+PMLfull <- read.table(
+  "C:\\Users\\steve\\Desktop\\Coursera\\MachLearn\\pml-training.csv",
+  header = TRUE, sep = ",", na.strings = "#DIV/0!", 
+)
+PMLuseful <- PMLfull[, c(2, 6:11, 37:49, 60:68, 84:86, 102, 113:124, 140, 151:160 )]
+PMLuseful$classe <- as.factor(PMLuseful$classe)
+PMLuseful$user_name <- as.factor(PMLuseful$user_name)
+
+PMLtest <- read.table(
+  "C:\\Users\\steve\\Desktop\\Coursera\\MachLearn\\pml-testing.csv",
+  header = TRUE, sep = ",")[, c(2, 6:11, 37:49, 60:68, 84:86, 102, 113:124, 140, 151:160 )]
+PMLtest$user_name <- as.factor(PMLtest$user_name)
+
+
+```
+
+With so many data collection points
+>...it is now possible to collect a large amount of data about personal activity relatively inexpensively. ... In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.  
+
+###Data 
+
+The training data for this project are available here: 
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here: 
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment. 
+
+What you should submit
+
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases. 
+
+1. Your submission should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
+2. You should also apply your machine learning algorithm to the 20 test cases available in the test data above. Please submit your predictions in appropriate format to the programming assignment for automated grading. See the programming assignment for additional details. 
+
+Reproducibility 
+
+Due to security concerns with the exchange of R code, your code will not be run during the evaluation by your classmates. Please be sure that if they download the repo, they will be able to view the compiled HTML version of your analysis. 
+
+Please upload a link to the github repository containing your .Rmd or .md file and your compiled HTML file performing your analysis. 
+BI Link<code>MathPreviewEdit: Rich
+
+Evaluation/feedback on the above work
+
+Note: this section can only be filled out during the evaluation phase.
+Has the student submitted a github repo?
+
+Does the submission build a machine learning algorithm to predict activity quality from activity monitors?
+
+To evaluate the HTML file you may have to download the repo and open the compiled HTML document. 
+
+Alternatively if they have submitted a repo with a gh-pages branch, you may be able to view the HTML page on the web. If the repo is: 
+
+https://github.com/DataScienceSpecialization/courses/tree/master/08_PracticalMachineLearning/001predictionMotivation
+
+then you can view the HTML page here: 
+
+http://datasciencespecialization.github.io/courses/08_PracticalMachineLearning/001predictionMotivation/
+
+Do the authors describe what they expect the out of sample error to be and estimate the error appropriately with cross-validation?
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Weight Lifting Exercises Dataset
+
+
+On-body sensing schema
+
+
+
+
+This human activity recognition research has traditionally focused on discriminating between different activities, i.e. to predict "which" activity was performed at a specific point in time (like with the Daily Living Activities dataset above). The approach we propose for the Weight Lifting Exercises dataset is to investigate "how (well)" an activity was performed by the wearer. The "how (well)" investigation has only received little attention so far, even though it potentially provides useful information for a large variety of applications,such as sports training.
+
+In this work (see the paper) we first define quality of execution and investigate three aspects that pertain to qualitative activity recognition: the problem of specifying correct execution, the automatic and robust detection of execution mistakes, and how to provide feedback on the quality of execution to the user. We tried out an on-body sensing approach (dataset here), but also an "ambient sensing approach" (by using Microsoft Kinect - dataset still unavailable)
+
+Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).
+
+Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes. Participants were supervised by an experienced weight lifter to make sure the execution complied to the manner they were supposed to simulate. The exercises were performed by six male participants aged between 20-28 years, with little weight lifting experience. We made sure that all participants could easily simulate the mistakes in a safe and controlled manner by using a relatively light dumbbell (1.25kg).
+
+
+
+Read more: http://groupware.les.inf.puc-rio.br/har#ixzz3PJ8LvOf1
