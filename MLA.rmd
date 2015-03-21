@@ -1,42 +1,58 @@
 ---
-title: "Predcition of Activity Levels"
+title: "Prediction of Activity Levels"
 author: "S. Schwarzbek"
-date: "Tuesday, January 20, 2015"
-output: html_document
+date: "20 March 2015"
+output:
+  html_document: default
+  pdf_document:
+    fig_height: 3
 ---
+With so many data collection points  
+>...it is now possible to collect a large amount of data about personal activity relatively inexpensively. ... In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.  
+
 ```{r dataLoad}
 library(caret)
 PMLfull <- read.table(
   "C:\\Users\\steve\\Desktop\\Coursera\\MachLearn\\pml-training.csv",
-  header = TRUE, sep = ",", na.strings = "#DIV/0!", 
-)
+  header = TRUE, sep = ",", na.strings = "#DIV/0!" )
 PMLuseful <- PMLfull[, c(2, 6:11, 37:49, 60:68, 84:86, 102, 113:124, 140, 151:160 )]
 PMLuseful$classe <- as.factor(PMLuseful$classe)
 PMLuseful$user_name <- as.factor(PMLuseful$user_name)
-
-PMLtest <- read.table(
-  "C:\\Users\\steve\\Desktop\\Coursera\\MachLearn\\pml-testing.csv",
-  header = TRUE, sep = ",")[, c(2, 6:11, 37:49, 60:68, 84:86, 102, 113:124, 140, 151:160 )]
-PMLtest$user_name <- as.factor(PMLtest$user_name)
-
-
 ```
 
-With so many data collection points
->...it is now possible to collect a large amount of data about personal activity relatively inexpensively. ... In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.  
-
 ###Data 
+>The training data for this project are available here: 
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv  
+>https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
 
-The training data for this project are available here: 
+>The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment._
 
-https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+###Variable Inspection  
+We've reduced the variable kept in the fits for modeling. Easiest to jettison are those with many NA's. After a few views, the direct measurements (yaw, pitch, roll, on the belt, forearm, and the dumbell itself) are easiest to define and most predictive.
 
-The test data are available here: 
+###Analysis  
+RandomForest is thorough,  
+```{r RandomForestReference}
+#two.mdl <-train(classe ~ ., PMLuseful[, -c(2,3)], method = "rf")
+two.mdl <- readRDS("RandomForestResults")
+varImp(two.mdl)
+predict(two.mdl, PMLtest[, -c(2,3)])
+```  
+but takes too long ( `r round(two.mdl$times$everything[3]/3600, 2)` hours elapsed on  my device) for writing up reports. We've reloaded a saved version for display.  
+Our expected error, estimated fom outof bag assessment in training is 
+```{r rf_summary}
+two.mdl$results 
+```
 
-https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
 
-The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment. 
+Sometimes, the simplest fit is the best. A five group nearest neighbor classification (knn, n=5) generates a straightforward assessment, with some sense of "near misses."
 
+```{r Knn_the_simple_way}
+knn.mdl <- knn3(classe ~ ., data = PML, k=5)
+knn.pred <- predict(knn.mdl, PMLtest[, -c(2,3)])
+knn.pred
+```
+###Appendix Class Notes  
 What you should submit
 
 The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases. 
@@ -69,28 +85,10 @@ then you can view the HTML page here:
 http://datasciencespecialization.github.io/courses/08_PracticalMachineLearning/001predictionMotivation/
 
 Do the authors describe what they expect the out of sample error to be and estimate the error appropriately with cross-validation?
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r}
-summary(cars)
-```
-
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 Weight Lifting Exercises Dataset
 
-
 On-body sensing schema
-
-
-
 
 This human activity recognition research has traditionally focused on discriminating between different activities, i.e. to predict "which" activity was performed at a specific point in time (like with the Daily Living Activities dataset above). The approach we propose for the Weight Lifting Exercises dataset is to investigate "how (well)" an activity was performed by the wearer. The "how (well)" investigation has only received little attention so far, even though it potentially provides useful information for a large variety of applications,such as sports training.
 
